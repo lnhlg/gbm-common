@@ -1,5 +1,4 @@
-module gbm-common
-
+module github.com/lnhlg/gbm-common
 go 1.23.4
 
 require (
