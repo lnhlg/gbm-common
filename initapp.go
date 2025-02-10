@@ -22,7 +22,7 @@ type app struct {
 
 type appResult struct {
 	Reg     *nacos.Registry
-	logger  log.Logger
+	Logger  log.Logger
 	Metrics *Metrics
 	Cfg     config.Config
 }
