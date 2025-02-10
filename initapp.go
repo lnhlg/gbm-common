@@ -3,11 +3,11 @@ package common
 import (
 	"os"
 
-	"github.com/go-kratos/kratos/contrib/registry/nacos/v2"
 	"github.com/go-kratos/kratos/v2/config"
 	"github.com/go-kratos/kratos/v2/config/file"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/tracing"
+	"github.com/go-kratos/kratos/v2/registry"
 
 	"gopkg.in/yaml.v3"
 )
@@ -21,7 +21,7 @@ type app struct {
 }
 
 type appResult struct {
-	Reg     *nacos.Registry
+	Reg     registry.Registrar
 	Logger  log.Logger
 	Metrics *Metrics
 	Cfg     config.Config
@@ -82,7 +82,7 @@ func (a *app) Init(
 
 	return &appResult{
 		Reg:     reg,
-		logger:  logger,
+		Logger:  logger,
 		Metrics: gbmMetrics,
 		Cfg:     c,
 	}, nil
