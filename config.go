@@ -6,7 +6,7 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-type config struct {
+type appConfig struct {
 	Nacos nacosSettings `yaml:"nacos"`
 }
 
@@ -21,14 +21,14 @@ type nacosServer struct {
 	Port uint64 `yaml:"port"`
 }
 
-func NewConfig(path string) (*config, error) {
+func NewConfig(path string) (*appConfig, error) {
 
 	f, err := os.ReadFile(path + "/config.yaml")
 	if err != nil {
 		return nil, err
 	}
 
-	var c config
+	var c appConfig
 	err = yaml.Unmarshal(f, &c)
 	if err != nil {
 		return nil, err
