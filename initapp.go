@@ -24,6 +24,7 @@ type appResult struct {
 	Reg     *nacos.Registry
 	logger  log.Logger
 	Metrics *Metrics
+	C       config.Config
 }
 
 func NewApp(
@@ -83,5 +84,6 @@ func (a *app) Init(
 		Reg:     reg,
 		logger:  logger,
 		Metrics: gbmMetrics,
+		C:       c,
 	}, nil
 }
