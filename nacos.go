@@ -10,51 +10,48 @@ import (
 )
 
 type NacosCfgSource struct {
-	// cfg *config
 	sc       []constant.ServerConfig
 	userName string
 	password string
 }
 
-func NewNacosCfgSource(cfgFile string) (*NacosCfgSource, error) {
-	cfg, err := NewConfig(cfgFile)
-	if err != nil {
-		return nil, err
-	}
-	sc := make([]constant.ServerConfig, len(cfg.Nacos.Servers))
-	for i := range cfg.Nacos.Servers {
-		sc[i] = *constant.NewServerConfig(
-			cfg.Nacos.Servers[i].Host,
-			cfg.Nacos.Servers[i].Port,
-		)
-	}
+type NacosHost struct {
+	Host string
+	Port uint64
+}
 
+// 修改 NewNacosCfgSource 函数，直接接收服务器配置、用户名和密码
+func NewNacosCfgSource(
+	svs []*NacosHost,
+	userName,
+	password string,
+) *NacosCfgSource {
+	sc := make([]constant.ServerConfig, len(svs))
+	for i, s := range svs {
+		sc[i] = constant.ServerConfig{
+			IpAddr: s.Host,
+			Port:   s.Port,
+		}
+	}
 	return &NacosCfgSource{
 		sc:       sc,
-		userName: cfg.Nacos.UserName,
-		password: cfg.Nacos.Password,
-	}, nil
+		userName: userName,
+		password: password,
+	}
 }
 
 func (nfs *NacosCfgSource) NacosSource(namespaceid, dataid, group string) (kconfig.Source, error) {
-
-	// sc := make([]constant.ServerConfig, len(nfs.cfg.Nacos))
-	// for i := range nfs.cfg.Nacos {
-	// 	sc[i] = *constant.NewServerConfig(nfs.cfg.Nacos[i].Host, nfs.cfg.Nacos[i].Port)
-	// }
-
 	cc := &constant.ClientConfig{
 		NamespaceId:         namespaceid, //namespace id
 		TimeoutMs:           5000,
 		NotLoadCacheAtStart: true,
-		LogDir:              "/tmp/nacos/log",
-		CacheDir:            "/tmp/nacos/cache",
+		LogDir:              "./tmp/nacos/log",
+		CacheDir:            "./tmp/nacos/cache",
 		LogLevel:            "debug",
 		Username:            nfs.userName,
 		Password:            nfs.password,
 	}
 
-	// a more graceful way to create naming client
 	client, err := clients.NewConfigClient(
 		vo.NacosClientParam{
 			ClientConfig:  cc,
@@ -62,7 +59,6 @@ func (nfs *NacosCfgSource) NacosSource(namespaceid, dataid, group string) (kconf
 		},
 	)
 	if err != nil {
-
 		return nil, err
 	}
 
@@ -75,7 +71,6 @@ func (nfs *NacosCfgSource) NacosSource(namespaceid, dataid, group string) (kconf
 }
 
 func (nfs *NacosCfgSource) NacosNaming(NamespaceId string) (*nacos.Registry, error) {
-
 	client, err := clients.NewNamingClient(
 		vo.NacosClientParam{
 			ServerConfigs: nfs.sc,
@@ -89,7 +84,6 @@ func (nfs *NacosCfgSource) NacosNaming(NamespaceId string) (*nacos.Registry, err
 	)
 
 	if err != nil {
-
 		return nil, err
 	}
 
