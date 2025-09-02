@@ -49,6 +49,21 @@ type AGV struct {
 
 // ===================== 基础工具函数 =====================
 
+// ConvertFloat64SliceToPoints 将[][]float64转换为[]Point
+// 参数:
+//   points: 二维浮点数切片，每个子切片应包含X,Y坐标
+// 返回:
+//   []Point: 转换后的Point切片
+func Float64SliceToPoints(points [][]float64) []Point {
+	result := make([]Point, len(points))
+	for i, p := range points {
+		if len(p) >= 2 {
+			result[i] = Point{X: p[0], Y: p[1]}
+		}
+	}
+	return result
+}
+
 // getDistance 计算两点之间的欧式距离
 // 参数:
 //   p1, p2: 两个点
