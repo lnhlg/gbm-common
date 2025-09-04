@@ -213,7 +213,7 @@ func (agv *AGV) GenerateSubPath() []Point {
 // 返回:
 //   Pose: 预测出的位姿
 func (agv *AGV) PredictPosition(dt float64) Pose {
-	newPath := agv.GenerateSubPath()
+	newPath := agv.SubPath
 	n := len(newPath)
 	if n < 2 {
 		return agv.Pose
