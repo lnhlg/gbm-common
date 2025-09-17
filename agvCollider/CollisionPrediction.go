@@ -209,7 +209,7 @@ func PredictCollisionsForFleetOptimized(agvs []*AGV, timeRange, timeStep, collis
 			}
 
 			// 检测碰撞
-			if hasCollision, collision := agvs[i].PredictCollisionWith(agvs[j], timeRange, timeStep, collisionThreshold); hasCollision {
+			if hasCollision, collision := vs[i].PredictCollisionWith(vs[j], timeRange, timeStep, collisionThreshold); hasCollision {
 				collisions = append(collisions, collision)
 			}
 
