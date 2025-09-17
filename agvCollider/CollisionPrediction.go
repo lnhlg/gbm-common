@@ -182,26 +182,29 @@ func PredictCollisionsForFleetOptimized(agvs []*AGV, timeRange, timeStep, collis
 	var collisions []CollisionPrediction
 	seen := make(map[int]map[int]bool)
 
-	if useSpatialIndex && len(agvs) > 10 {
+	// 剔除在原点的AGV
+	vs := filterAGVsByOrigin(agvs)
+
+	if useSpatialIndex && len(vs) > 10 {
 		// 对于大型车队，使用KD树优化
-		return predictCollisionsForFleetWithKDTree(agvs, timeRange, timeStep, collisionThreshold)
+		return predictCollisionsForFleetWithKDTree(vs, timeRange, timeStep, collisionThreshold)
 	}
 
 	// 对于小型车队，使用原始方法
-	for i := range agvs {
-		for j := range agvs {
+	for i := range vs {
+		for j := range vs {
 			if i >= j {
 				continue // 避免重复检查同一对AGV
 			}
 
 			// 检查是否已经处理过这对AGV
-			if seen[agvs[i].Id] == nil {
-				seen[agvs[i].Id] = make(map[int]bool)
+			if seen[vs[i].Id] == nil {
+				seen[vs[i].Id] = make(map[int]bool)
 			}
-			if seen[agvs[j].Id] == nil {
-				seen[agvs[j].Id] = make(map[int]bool)
+			if seen[vs[j].Id] == nil {
+				seen[vs[j].Id] = make(map[int]bool)
 			}
-			if seen[agvs[i].Id][agvs[j].Id] || seen[agvs[j].Id][agvs[i].Id] {
+			if seen[vs[i].Id][vs[j].Id] || seen[vs[j].Id][vs[i].Id] {
 				continue
 			}
 
@@ -211,9 +214,20 @@ func PredictCollisionsForFleetOptimized(agvs []*AGV, timeRange, timeStep, collis
 			}
 
 			// 标记已处理
-			seen[agvs[i].Id][agvs[j].Id] = true
+			seen[vs[i].Id][vs[j].Id] = true
 		}
 	}
 
 	return collisions
+}
+
+// filterAGVsByOrigin 剔除在原点的AGV
+func filterAGVsByOrigin(agvs []*AGV) []*AGV {
+	var filteredAGVs []*AGV
+	for _, agv := range agvs {
+		if agv.Pose.X != 0 || agv.Pose.Y != 0 {
+			filteredAGVs = append(filteredAGVs, agv)
+		}
+	}
+	return filteredAGVs
 }
